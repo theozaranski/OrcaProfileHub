@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Orca Profile Hub</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+</head>
+<body>
+  <div class="page-shell">
+    <header class="site-header">
+      <div class="brand-block">
+        <h1>Orca Profile Hub</h1>
+        <p class="header-copy">
+          Bibliotheque communautaire de profils <strong>3MF</strong> pour OrcaSlicer.
+          Tu telecharges, tu importes le fichier dans OrcaSlicer, et les reglages sont appliques en 1 clic.
+          <a href="https://www.orcaslicer.com/download/" target="_blank" rel="noopener noreferrer">Telecharger OrcaSlicer</a>
+        </p>
+      </div>
+
+      <div class="header-actions">
+        <button id="loginBtn" type="button">Connexion</button>
+        <button id="logoutBtn" class="logout-btn" type="button" hidden>Deconnexion</button>
+      </div>
+    </header>
+
+    <main class="layout">
+      <section class="hero-panel">
+        <div class="hero-copy">
+          <h2>Des profils 3MF prets a importer dans OrcaSlicer.</h2>
+
+          <p>
+            Telecharge, importe, imprime.
+          </p>
+
+          <div class="hero-steps" aria-label="Comment ca marche">
+            <div class="step-chip">
+              <span class="step-index">1</span>
+              <span>Telecharge un 3MF</span>
+            </div>
+            <div class="step-chip">
+              <span class="step-index">2</span>
+              <span>Importe-le dans OrcaSlicer</span>
+            </div>
+            <div class="step-chip">
+              <span class="step-index">3</span>
+              <span>Les reglages sont deja remplis</span>
+            </div>
+          </div>
+
+          <div class="toolbar">
+            <button id="openModalBtn" class="upload-btn" type="button">
+              + Ajouter un profil d'impression
+            </button>
+            <span id="toolbarStatus" class="toolbar-status"></span>
+          </div>
+        </div>
+
+        <div class="hero-visual" aria-hidden="true">
+          <div class="printer-frame">
+            <div class="printer-screen">
+              <img
+                src="images/hero-3d-printer-gold.png"
+                alt="Illustration premium d'une imprimante 3D noir et or imprimant un Benchy"
+                class="hero-art"
+              />
+            </div>
+
+            <div class="visual-card visual-card-top">
+              <span>Fast import</span>
+              <strong>3MF > OrcaSlicer</strong>
+            </div>
+
+            <div class="visual-card visual-card-bottom">
+              <span>DA impression 3D</span>
+              <strong>Profil, filament, buse, variante</strong>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section class="filters-panel">
+        <div class="panel-heading">
+          <div>
+            <span class="panel-kicker">Explorer la bibliotheque</span>
+            <h3>Filtre par machine, matiere et buse</h3>
+          </div>
+          <div class="panel-actions">
+            <button id="resetFiltersBtn" class="ghost-btn" type="button">Reinitialiser</button>
+          </div>
+        </div>
+
+        <section class="filters">
+          <div class="dropdown-wrapper">
+            <input id="printerInput" placeholder="Toutes les imprimantes" autocomplete="off" />
+            <div id="printerList" class="dropdown"></div>
+          </div>
+
+          <div class="dropdown-wrapper">
+            <input id="filamentInput" placeholder="Tous les filaments" autocomplete="off" />
+            <div id="filamentList" class="dropdown"></div>
+          </div>
+
+          <div class="dropdown-wrapper">
+            <input id="nozzleInput" placeholder="Toutes les buses" autocomplete="off" />
+            <div id="nozzleList" class="dropdown"></div>
+          </div>
+        </section>
+      </section>
+
+      <section class="profiles-section">
+        <div class="section-heading">
+          <div>
+            <span class="panel-kicker">Collection ouverte</span>
+            <h3>Profils partages</h3>
+          </div>
+          <div id="resultsSummary" class="results-summary">Chargement...</div>
+        </div>
+
+        <div id="profiles" class="grid" aria-live="polite"></div>
+      </section>
+    </main>
+  </div>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-content" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+      <h2 id="modalTitle">Ajouter un profil</h2>
+
+      <div class="form-group">
+        <label for="name">Nom du profil</label>
+        <input id="name" placeholder="Nom du profil" autocomplete="off" />
+      </div>
+
+      <div class="form-group">
+        <label for="file">Fichier (.3mf)</label>
+        <input type="file" id="file" accept=".3mf" />
+      </div>
+
+      <div class="form-group">
+        <label for="printerUpload">Imprimante</label>
+        <div class="dropdown-wrapper">
+          <input id="printerUpload" placeholder="Choisir une imprimante" autocomplete="off" />
+          <div id="printerUploadList" class="dropdown"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="variantUpload">Variante</label>
+        <div class="dropdown-wrapper">
+          <input id="variantUpload" placeholder="Choisir une variante" autocomplete="off" />
+          <div id="variantUploadList" class="dropdown"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="filamentUpload">Filament</label>
+        <div class="dropdown-wrapper">
+          <input id="filamentUpload" placeholder="Choisir un filament" autocomplete="off" />
+          <div id="filamentUploadList" class="dropdown"></div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="nozzleUpload">Buse (optionnel)</label>
+        <div class="dropdown-wrapper">
+          <input id="nozzleUpload" placeholder="0.4" autocomplete="off" />
+          <div id="nozzleUploadList" class="dropdown"></div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button id="uploadBtn" type="button" disabled>Envoyer</button>
+        <button id="closeModalBtn" type="button">Fermer</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
