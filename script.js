@@ -205,19 +205,27 @@ async function logout() {
 
 async function getUser() {
   const { data, error } = await sb.auth.getUser();
-  if (error) {
+
+  const missingSession =
+    error?.name === "AuthSessionMissingError" ||
+    error?.message === "Auth session missing!";
+
+  if (error && !missingSession) {
     console.error("Erreur auth:", error);
   }
 
-  const isConnected = Boolean(data?.user);
-  state.currentUserId = data?.user?.id ?? null;
+  const user = missingSession ? null : (data?.user ?? null);
+  const isConnected = Boolean(user);
+  state.currentUserId = user?.id ?? null;
 
   setButtonVisibility(dom.loginBtn, !isConnected);
   setButtonVisibility(dom.logoutBtn, isConnected);
   dom.openModalBtn.disabled = !isConnected;
-  setToolbarStatus(isConnected ? "" : "Connecte-toi pour ajouter un profil.");
+  setToolbarStatus(
+    isConnected ? "" : "Mode visiteur. Connecte-toi pour ajouter un profil."
+  );
 
-  return data?.user ?? null;
+  return user;
 }
 
 function hideDropdowns(exceptList = null) {
