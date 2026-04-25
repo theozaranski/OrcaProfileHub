@@ -46,6 +46,12 @@ function uniqueValues(values) {
   return [...new Set(values.filter(Boolean))];
 }
 
+function getAuthRedirectUrl() {
+  const url = new URL(window.location.href);
+  url.hash = "";
+  return url.toString();
+}
+
 function slugifyFileBaseName(fileName) {
   return (fileName ?? "")
     .normalize("NFD")
@@ -205,7 +211,12 @@ async function applyFilters() {
 }
 
 async function login() {
-  await sb.auth.signInWithOAuth({ provider: "google" });
+  await sb.auth.signInWithOAuth({
+    provider: "google",
+    options: {
+      redirectTo: getAuthRedirectUrl()
+    }
+  });
 }
 
 async function logout() {
