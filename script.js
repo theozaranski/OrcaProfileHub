@@ -46,6 +46,17 @@ function uniqueValues(values) {
   return [...new Set(values.filter(Boolean))];
 }
 
+function slugifyFileBaseName(fileName) {
+  return (fileName ?? "")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/\.[^.]+$/, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 80) || "profil";
+}
+
 function findPrinterByLabel(label) {
   const normalized = normalizeText(label);
   return state.printers.find((printer) => normalizeText(printer.label) === normalized) ?? null;
@@ -514,11 +525,26 @@ async function upload() {
     return;
   }
 
-  const fileName = `${Date.now()}_${file.name}`;
-  const { error: uploadError } = await sb.storage.from("profiles").upload(fileName, file);
+  const safeBaseName = slugifyFileBaseName(file.name);
+  const fileName = `${Date.now()}-${safeBaseName}.3mf`;
+  const { error: uploadError } = await sb.storage
+    .from("profiles")
+    .upload(fileName, file, {
+      cacheControl: "3600",
+      contentType: file.type || "application/octet-stream",
+      upsert: false
+    });
+
   if (uploadError) {
     console.error("Erreur upload storage:", uploadError);
-    alert("Impossible d'envoyer le fichier.");
+    const details = [uploadError.message, uploadError.error, uploadError.statusCode]
+      .filter(Boolean)
+      .join(" | ");
+    alert(
+      details
+        ? `Impossible d'envoyer le fichier. ${details}`
+        : "Impossible d'envoyer le fichier."
+    );
     return;
   }
 
