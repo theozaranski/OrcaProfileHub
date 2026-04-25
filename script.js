@@ -964,6 +964,7 @@ function bindEvents() {
 
 async function init() {
   cacheDom();
+  initImageZoom();
   state.language = getPreferredLanguage();
   applyStaticTranslations();
   bindEvents();
@@ -1001,3 +1002,26 @@ async function init() {
 document.addEventListener("DOMContentLoaded", () => {
   init();
 });
+
+function initImageZoom() {
+  const modal = document.getElementById("imageModal");
+  const modalImg = document.getElementById("modalImage");
+  const closeBtn = document.getElementById("closeImageModal");
+
+  document.querySelectorAll(".zoomable-image").forEach((img) => {
+    img.addEventListener("click", () => {
+      modal.style.display = "flex";
+      modalImg.src = img.src;
+    });
+  });
+
+  closeBtn.addEventListener("click", () => {
+    modal.style.display = "none";
+  });
+
+  modal.addEventListener("click", (e) => {
+    if (e.target === modal) {
+      modal.style.display = "none";
+    }
+  });
+}
