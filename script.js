@@ -502,91 +502,103 @@ function checkUploadForm() {
 }
 
 async function upload() {
-  const file = dom.file.files[0];
-  const name = dom.name.value.trim();
-  const printer = findPrinterByLabel(dom.printerUpload.value);
-  const variant = printer ? findVariantByNameAndPrinter(dom.variantUpload.value, printer.id) : null;
-  const filament = findFilamentByName(dom.filamentUpload.value);
-  const nozzleValue = dom.nozzleUpload.value.trim();
-  const nozzle = !nozzleValue ? null : findNozzleByLabel(nozzleValue);
+  let uploadedFileName = null;
 
-  const { data, error: userError } = await sb.auth.getUser();
-  if (userError) {
-    console.error("Erreur utilisateur:", userError);
-  }
+  try {
+    const file = dom.file.files[0];
+    const name = dom.name.value.trim();
+    const printer = findPrinterByLabel(dom.printerUpload.value);
+    const variant = printer ? findVariantByNameAndPrinter(dom.variantUpload.value, printer.id) : null;
+    const filament = findFilamentByName(dom.filamentUpload.value);
+    const nozzleValue = dom.nozzleUpload.value.trim();
+    const nozzle = !nozzleValue ? null : findNozzleByLabel(nozzleValue);
 
-  const user = data?.user;
-
-  if (!user) {
-    alert("Connecte-toi pour envoyer un profil.");
-    return;
-  }
-
-  if (!file || !name || !printer || !variant || !filament) {
-    alert("Formulaire incomplet.");
-    return;
-  }
-
-  if (nozzleValue && !nozzle) {
-    alert("Choisis une buse existante dans la liste.");
-    return;
-  }
-
-  if (!file.name.toLowerCase().endsWith(".3mf")) {
-    alert("Le fichier doit etre au format .3mf.");
-    return;
-  }
-
-  const safeBaseName = slugifyFileBaseName(file.name);
-  const fileName = `${Date.now()}-${safeBaseName}.3mf`;
-  const { error: uploadError } = await sb.storage
-    .from("profiles")
-    .upload(fileName, file, {
-      cacheControl: "3600",
-      contentType: file.type || "application/octet-stream",
-      upsert: false
-    });
-
-  if (uploadError) {
-    console.error("Erreur upload storage:", uploadError);
-    const details = [uploadError.message, uploadError.error, uploadError.statusCode]
-      .filter(Boolean)
-      .join(" | ");
-    alert(
-      details
-        ? `Impossible d'envoyer le fichier. ${details}`
-        : "Impossible d'envoyer le fichier."
-    );
-    return;
-  }
-
-  const { error: insertError } = await sb.from("profiles").insert([
-    {
-      name,
-      file: fileName,
-      printer_id: printer.id,
-      variant_id: variant.id,
-      filament_id: filament.id,
-      nozzle_id: nozzle?.id ?? null
+    const { data, error: userError } = await sb.auth.getUser();
+    if (userError) {
+      console.error("Erreur utilisateur:", userError);
     }
-  ]);
 
-  if (insertError) {
-    console.error("Erreur insertion profil:", insertError);
-    await sb.storage.from("profiles").remove([fileName]);
-    alert("Impossible d'enregistrer le profil.");
-    return;
+    const user = data?.user;
+
+    if (!user) {
+      alert("Connecte-toi pour envoyer un profil.");
+      return;
+    }
+
+    if (!file || !name || !printer || !variant || !filament) {
+      alert("Formulaire incomplet.");
+      return;
+    }
+
+    if (file.size > 50 * 1024 * 1024) {
+      alert("Fichier trop lourd (max 50MB)");
+      return;
+    }
+
+    if (nozzleValue && !nozzle) {
+      alert("Choisis une buse existante dans la liste.");
+      return;
+    }
+
+    if (!file.name.toLowerCase().endsWith(".3mf")) {
+      alert("Le fichier doit etre au format .3mf.");
+      return;
+    }
+
+    const safeBaseName = slugifyFileBaseName(file.name);
+    const fileName = `${Date.now()}-${safeBaseName}.3mf`;
+    uploadedFileName = fileName;
+
+    const { error: uploadError } = await sb.storage
+      .from("profiles")
+      .upload(fileName, file, {
+        cacheControl: "3600",
+        contentType: file.type || "application/octet-stream",
+        upsert: false
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { error: insertError } = await sb.from("profiles").insert([
+      {
+        name,
+        file: fileName,
+        printer_id: printer.id,
+        variant_id: variant.id,
+        filament_id: filament.id,
+        nozzle_id: nozzle?.id ?? null,
+        user_id: user.id
+      }
+    ]);
+
+    if (insertError) {
+      throw insertError;
+    }
+
+    dom.name.value = "";
+    dom.file.value = "";
+    dom.printerUpload.value = "";
+    dom.variantUpload.value = "";
+    dom.filamentUpload.value = "";
+    dom.nozzleUpload.value = "";
+    checkUploadForm();
+    closeModal();
+    await loadProfiles();
+  } catch (error) {
+    console.error("Erreur upload profil:", error);
+
+    if (uploadedFileName) {
+      await sb.storage.from("profiles").remove([uploadedFileName]);
+    }
+
+    if (error?.message?.includes("Limite")) {
+      alert("Tu as atteint la limite de 6 uploads aujourd'hui.");
+    } else {
+      alert(error?.message || "Impossible d'envoyer le fichier.");
+    }
   }
-
-  dom.name.value = "";
-  dom.file.value = "";
-  dom.printerUpload.value = "";
-  dom.variantUpload.value = "";
-  dom.filamentUpload.value = "";
-  dom.nozzleUpload.value = "";
-  checkUploadForm();
-  closeModal();
-  await loadProfiles();
 }
 
 async function deleteProfile(id, file) {
