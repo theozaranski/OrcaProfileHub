@@ -14,11 +14,289 @@ const state = {
     filament: "",
     nozzle: ""
   },
+  language: "fr",
   currentUserId: null,
   isLoading: false
 };
 
+const STORAGE_LANGUAGE_KEY = "oph_language";
+
+const translations = {
+  fr: {
+    meta: {
+      title: "Orca Profile Hub"
+    },
+    header: {
+      copyHtml:
+        'Bibliotheque communautaire de profils <strong>3MF</strong> pour OrcaSlicer. Tu telecharges, tu importes le fichier dans OrcaSlicer, et les reglages sont appliques en 1 clic. <a href="https://www.orcaslicer.com/download/" target="_blank" rel="noopener noreferrer">Telecharger OrcaSlicer</a>'
+    },
+    auth: {
+      login: "Connexion",
+      logout: "Deconnexion"
+    },
+    hero: {
+      title: "Des profils 3MF prets a importer dans OrcaSlicer.",
+      subtitle: "Telecharge, importe, imprime.",
+      stepsAriaLabel: "Comment ca marche",
+      step1: "Telecharge un 3MF",
+      step2: "Importe-le dans OrcaSlicer",
+      step3: "Les reglages sont deja remplis",
+      imageAlt: "Illustration premium d'une imprimante 3D noir et or imprimant un Benchy"
+    },
+    visual: {
+      fastImport: "Import rapide",
+      communityLabel: "Impression 3D",
+      communityDetail: "Profil, filament, buse, variante"
+    },
+    toolbar: {
+      addProfile: "+ Ajouter un profil d'impression",
+      guestStatus: "Mode visiteur. Connecte-toi pour ajouter un profil.",
+      loadingError: "Erreur de chargement des donnees."
+    },
+    filters: {
+      kicker: "Explorer la bibliotheque",
+      title: "Filtre par machine, matiere et buse",
+      reset: "Reinitialiser",
+      printerPlaceholder: "Toutes les imprimantes",
+      filamentPlaceholder: "Tous les filaments",
+      nozzlePlaceholder: "Toutes les buses"
+    },
+    profiles: {
+      kicker: "Collection ouverte",
+      title: "Profils partages",
+      loading: "Chargement...",
+      loadingList: "Chargement des profils...",
+      noneAvailable: "Aucun profil disponible pour le moment.",
+      noneForFilters: "Aucun profil trouve pour ces filtres.",
+      loadError: "Impossible de charger les profils. {message}",
+      initError: "Impossible d'initialiser l'application.",
+      zeroSummary: "Aucun profil disponible",
+      availableSummary: "{total} profil{plural} disponible{plural}",
+      filteredSummary: "{filtered} / {total} profil{pluralTotal} affiche{pluralFiltered}",
+      download: "Telecharger .3mf",
+      unavailable: "3mf indisponible",
+      delete: "Supprimer",
+      deleteConfirm: "Supprimer ?",
+      unknownPrinter: "Imprimante inconnue",
+      noName: "Profil sans nom",
+      fileReady: "Fichier 3MF pret",
+      fileMissing: "Profil sans fichier",
+      tagVariant: "Variante: {value}",
+      tagFilament: "Filament: {value}",
+      tagNozzle: "Buse: {value}"
+    },
+    modal: {
+      title: "Ajouter un profil",
+      nameLabel: "Nom du profil",
+      namePlaceholder: "Nom du profil",
+      fileLabel: "Fichier (.3mf)",
+      printerLabel: "Imprimante",
+      printerPlaceholder: "Choisir une imprimante",
+      variantLabel: "Variante",
+      variantPlaceholder: "Choisir une variante",
+      filamentLabel: "Filament",
+      filamentPlaceholder: "Choisir un filament",
+      nozzleLabel: "Buse (optionnel)",
+      send: "Envoyer",
+      close: "Fermer"
+    },
+    alerts: {
+      signInToUpload: "Connecte-toi pour envoyer un profil.",
+      signInToAdd: "Connecte-toi pour ajouter un profil.",
+      incompleteForm: "Formulaire incomplet.",
+      invalidNozzle: "Choisis une buse existante dans la liste.",
+      invalidFileType: "Le fichier doit etre au format .3mf.",
+      fileTooLarge: "Fichier trop lourd (max 50MB)",
+      uploadLimitReached: "Tu as atteint la limite de 6 uploads aujourd'hui.",
+      uploadFailed: "Impossible d'envoyer le fichier.",
+      deleteFailed: "Impossible de supprimer le profil."
+    },
+    labels: {
+      unknown: "?",
+      pluralS: "s"
+    }
+  },
+  en: {
+    meta: {
+      title: "Orca Profile Hub"
+    },
+    header: {
+      copyHtml:
+        'Community library of <strong>3MF</strong> profiles for OrcaSlicer. Download a file, import it into OrcaSlicer, and the settings are applied in 1 click. <a href="https://www.orcaslicer.com/download/" target="_blank" rel="noopener noreferrer">Download OrcaSlicer</a>'
+    },
+    auth: {
+      login: "Sign in",
+      logout: "Sign out"
+    },
+    hero: {
+      title: "3MF profiles ready to import into OrcaSlicer.",
+      subtitle: "Download, import, print.",
+      stepsAriaLabel: "How it works",
+      step1: "Download a 3MF",
+      step2: "Import it into OrcaSlicer",
+      step3: "Settings are already filled in",
+      imageAlt: "Premium illustration of a black and gold 3D printer printing a Benchy"
+    },
+    visual: {
+      fastImport: "Fast import",
+      communityLabel: "3D printing",
+      communityDetail: "Profile, filament, nozzle, variant"
+    },
+    toolbar: {
+      addProfile: "+ Add a print profile",
+      guestStatus: "Visitor mode. Sign in to add a profile.",
+      loadingError: "Data loading error."
+    },
+    filters: {
+      kicker: "Browse the library",
+      title: "Filter by machine, material and nozzle",
+      reset: "Reset",
+      printerPlaceholder: "All printers",
+      filamentPlaceholder: "All filaments",
+      nozzlePlaceholder: "All nozzles"
+    },
+    profiles: {
+      kicker: "Open collection",
+      title: "Shared profiles",
+      loading: "Loading...",
+      loadingList: "Loading profiles...",
+      noneAvailable: "No profiles available yet.",
+      noneForFilters: "No profiles found for these filters.",
+      loadError: "Unable to load profiles. {message}",
+      initError: "Unable to initialize the app.",
+      zeroSummary: "No profiles available",
+      availableSummary: "{total} profile{plural} available",
+      filteredSummary: "{filtered} / {total} profile{pluralTotal} shown",
+      download: "Download .3mf",
+      unavailable: "3mf unavailable",
+      delete: "Delete",
+      deleteConfirm: "Delete?",
+      unknownPrinter: "Unknown printer",
+      noName: "Untitled profile",
+      fileReady: "3MF file ready",
+      fileMissing: "Profile without file",
+      tagVariant: "Variant: {value}",
+      tagFilament: "Filament: {value}",
+      tagNozzle: "Nozzle: {value}"
+    },
+    modal: {
+      title: "Add a profile",
+      nameLabel: "Profile name",
+      namePlaceholder: "Profile name",
+      fileLabel: "File (.3mf)",
+      printerLabel: "Printer",
+      printerPlaceholder: "Choose a printer",
+      variantLabel: "Variant",
+      variantPlaceholder: "Choose a variant",
+      filamentLabel: "Filament",
+      filamentPlaceholder: "Choose a filament",
+      nozzleLabel: "Nozzle (optional)",
+      send: "Send",
+      close: "Close"
+    },
+    alerts: {
+      signInToUpload: "Sign in to upload a profile.",
+      signInToAdd: "Sign in to add a profile.",
+      incompleteForm: "Form is incomplete.",
+      invalidNozzle: "Choose an existing nozzle from the list.",
+      invalidFileType: "The file must be in .3mf format.",
+      fileTooLarge: "File is too large (max 50MB)",
+      uploadLimitReached: "You have reached the limit of 6 uploads today.",
+      uploadFailed: "Unable to upload the file.",
+      deleteFailed: "Unable to delete the profile."
+    },
+    labels: {
+      unknown: "?",
+      pluralS: "s"
+    }
+  }
+};
+
 const dom = {};
+
+function getTranslationValue(key) {
+  return key.split(".").reduce((value, segment) => value?.[segment], translations[state.language]);
+}
+
+function t(key, variables = {}) {
+  const template = getTranslationValue(key) ?? key;
+
+  if (typeof template !== "string") {
+    return template;
+  }
+
+  return template.replace(/\{(\w+)\}/g, (_, name) => variables[name] ?? "");
+}
+
+function getPreferredLanguage() {
+  const savedLanguage = window.localStorage.getItem(STORAGE_LANGUAGE_KEY);
+  if (savedLanguage === "fr" || savedLanguage === "en") {
+    return savedLanguage;
+  }
+
+  const browserLanguage = window.navigator.language?.toLowerCase() ?? "";
+  return browserLanguage.startsWith("fr") ? "fr" : "en";
+}
+
+function updateLanguageButtons() {
+  if (!dom.langFrBtn || !dom.langEnBtn) {
+    return;
+  }
+
+  dom.langFrBtn.classList.toggle("is-active", state.language === "fr");
+  dom.langEnBtn.classList.toggle("is-active", state.language === "en");
+  dom.langFrBtn.setAttribute("aria-pressed", String(state.language === "fr"));
+  dom.langEnBtn.setAttribute("aria-pressed", String(state.language === "en"));
+}
+
+function applyStaticTranslations() {
+  document.documentElement.lang = state.language;
+  document.title = t("meta.title");
+
+  if (dom.headerCopy) {
+    dom.headerCopy.innerHTML = t("header.copyHtml");
+  }
+
+  document.querySelectorAll("[data-i18n]").forEach((element) => {
+    element.textContent = t(element.dataset.i18n);
+  });
+
+  document.querySelectorAll("[data-i18n-placeholder]").forEach((element) => {
+    element.placeholder = t(element.dataset.i18nPlaceholder);
+  });
+
+  document.querySelectorAll("[data-i18n-alt]").forEach((element) => {
+    element.alt = t(element.dataset.i18nAlt);
+  });
+
+  document.querySelectorAll("[data-i18n-aria-label]").forEach((element) => {
+    element.setAttribute("aria-label", t(element.dataset.i18nAriaLabel));
+  });
+
+  updateLanguageButtons();
+}
+
+function setLanguage(language, persist = true) {
+  if (language !== "fr" && language !== "en") {
+    return;
+  }
+
+  state.language = language;
+
+  if (persist) {
+    window.localStorage.setItem(STORAGE_LANGUAGE_KEY, language);
+  }
+
+  applyStaticTranslations();
+
+  if (dom.toolbarStatus) {
+    setToolbarStatus(state.currentUserId ? "" : t("toolbar.guestStatus"));
+  }
+
+  if (dom.profiles) {
+    loadProfiles(false);
+  }
+}
 
 function setButtonVisibility(button, isVisible) {
   button.hidden = !isVisible;
@@ -131,8 +409,11 @@ function matchesSelectedFilters(profile) {
 }
 
 function cacheDom() {
+  dom.headerCopy = document.querySelector(".header-copy");
   dom.loginBtn = document.getElementById("loginBtn");
   dom.logoutBtn = document.getElementById("logoutBtn");
+  dom.langFrBtn = document.getElementById("langFrBtn");
+  dom.langEnBtn = document.getElementById("langEnBtn");
   dom.openModalBtn = document.getElementById("openModalBtn");
   dom.closeModalBtn = document.getElementById("closeModalBtn");
   dom.uploadBtn = document.getElementById("uploadBtn");
@@ -159,16 +440,24 @@ function setResultsSummary(total, filtered) {
   }
 
   if (total === 0) {
-    dom.resultsSummary.textContent = "Aucun profil disponible";
+    dom.resultsSummary.textContent = t("profiles.zeroSummary");
     return;
   }
 
   if (filtered === total) {
-    dom.resultsSummary.textContent = `${total} profil${total > 1 ? "s" : ""} disponible${total > 1 ? "s" : ""}`;
+    dom.resultsSummary.textContent = t("profiles.availableSummary", {
+      total,
+      plural: total > 1 ? t("labels.pluralS") : ""
+    });
     return;
   }
 
-  dom.resultsSummary.textContent = `${filtered} / ${total} profil${total > 1 ? "s" : ""} affiche${filtered > 1 ? "s" : ""}`;
+  dom.resultsSummary.textContent = t("profiles.filteredSummary", {
+    filtered,
+    total,
+    pluralTotal: total > 1 ? t("labels.pluralS") : "",
+    pluralFiltered: filtered > 1 ? t("labels.pluralS") : ""
+  });
 }
 
 function renderProfilesMessage(message) {
@@ -185,9 +474,9 @@ function renderProfilesList(profiles, currentUserId) {
 
   if (!profiles.length) {
     if (state.profiles.length > 0) {
-      renderProfilesMessage("Aucun profil trouve pour ces filtres.");
+      renderProfilesMessage(t("profiles.noneForFilters"));
     } else {
-      renderProfilesMessage("Aucun profil disponible pour le moment.");
+      renderProfilesMessage(t("profiles.noneAvailable"));
     }
     return;
   }
@@ -245,7 +534,7 @@ async function getUser() {
   setButtonVisibility(dom.logoutBtn, isConnected);
   dom.openModalBtn.disabled = !isConnected;
   setToolbarStatus(
-    isConnected ? "" : "Mode visiteur. Connecte-toi pour ajouter un profil."
+    isConnected ? "" : t("toolbar.guestStatus")
   );
 
   return user;
@@ -386,23 +675,23 @@ function createProfileCard(profile, currentUserId) {
 
   const printerHeadline = document.createElement("p");
   printerHeadline.className = "card-printer";
-  printerHeadline.textContent = profile.printerLabel || "Imprimante inconnue";
+  printerHeadline.textContent = profile.printerLabel || t("profiles.unknownPrinter");
   header.appendChild(printerHeadline);
 
   const title = document.createElement("h3");
-  title.textContent = profile.name || "Profil sans nom";
+  title.textContent = profile.name || t("profiles.noName");
   header.appendChild(title);
 
   const fileType = document.createElement("div");
   fileType.className = "card-format";
-  fileType.textContent = profile.file ? "Fichier 3MF pret" : "Profil sans fichier";
+  fileType.textContent = profile.file ? t("profiles.fileReady") : t("profiles.fileMissing");
   header.appendChild(fileType);
 
   const body = document.createElement("div");
   body.className = "card-body";
-  body.appendChild(createTag(`Variante: ${profile.variantLabel || "?"}`));
-  body.appendChild(createTag(`Filament: ${profile.filamentLabel || "?"}`));
-  body.appendChild(createTag(`Buse: ${profile.nozzleLabel || "?"}`));
+  body.appendChild(createTag(t("profiles.tagVariant", { value: profile.variantLabel || t("labels.unknown") })));
+  body.appendChild(createTag(t("profiles.tagFilament", { value: profile.filamentLabel || t("labels.unknown") })));
+  body.appendChild(createTag(t("profiles.tagNozzle", { value: profile.nozzleLabel || t("labels.unknown") })));
 
   const footer = document.createElement("div");
   footer.className = "card-footer";
@@ -415,12 +704,12 @@ function createProfileCard(profile, currentUserId) {
     downloadLink.target = "_blank";
     downloadLink.rel = "noopener noreferrer";
     downloadLink.download = profile.file;
-    downloadLink.textContent = "Telecharger .3mf";
+    downloadLink.textContent = t("profiles.download");
     footer.appendChild(downloadLink);
   } else {
     const unavailable = document.createElement("span");
     unavailable.className = "btn unavailable";
-    unavailable.textContent = "3mf indisponible";
+    unavailable.textContent = t("profiles.unavailable");
     footer.appendChild(unavailable);
   }
 
@@ -428,7 +717,7 @@ function createProfileCard(profile, currentUserId) {
     const deleteButton = document.createElement("button");
     deleteButton.type = "button";
     deleteButton.className = "btn delete";
-    deleteButton.textContent = "Supprimer";
+    deleteButton.textContent = t("profiles.delete");
     deleteButton.addEventListener("click", () => {
       deleteProfile(profile.id, profile.file);
     });
@@ -448,7 +737,7 @@ async function loadProfiles(refresh = true) {
 
   try {
     if (refresh) {
-      renderProfilesMessage("Chargement des profils...");
+      renderProfilesMessage(t("profiles.loadingList"));
       await fetchProfiles();
     }
 
@@ -460,7 +749,7 @@ async function loadProfiles(refresh = true) {
   } catch (error) {
     console.error("Erreur chargement profils:", error);
     setResultsSummary(0, 0);
-    renderProfilesMessage(`Impossible de charger les profils. ${error.message ?? ""}`.trim());
+    renderProfilesMessage(t("profiles.loadError", { message: error.message ?? "" }).trim());
   } finally {
     state.isLoading = false;
   }
@@ -521,27 +810,27 @@ async function upload() {
     const user = data?.user;
 
     if (!user) {
-      alert("Connecte-toi pour envoyer un profil.");
+      alert(t("alerts.signInToUpload"));
       return;
     }
 
     if (!file || !name || !printer || !variant || !filament) {
-      alert("Formulaire incomplet.");
+      alert(t("alerts.incompleteForm"));
       return;
     }
 
     if (file.size > 50 * 1024 * 1024) {
-      alert("Fichier trop lourd (max 50MB)");
+      alert(t("alerts.fileTooLarge"));
       return;
     }
 
     if (nozzleValue && !nozzle) {
-      alert("Choisis une buse existante dans la liste.");
+      alert(t("alerts.invalidNozzle"));
       return;
     }
 
     if (!file.name.toLowerCase().endsWith(".3mf")) {
-      alert("Le fichier doit etre au format .3mf.");
+      alert(t("alerts.invalidFileType"));
       return;
     }
 
@@ -594,22 +883,22 @@ async function upload() {
     }
 
     if (error?.message?.includes("Limite")) {
-      alert("Tu as atteint la limite de 6 uploads aujourd'hui.");
+      alert(t("alerts.uploadLimitReached"));
     } else {
-      alert(error?.message || "Impossible d'envoyer le fichier.");
+      alert(error?.message || t("alerts.uploadFailed"));
     }
   }
 }
 
 async function deleteProfile(id, file) {
-  if (!window.confirm("Supprimer ?")) {
+  if (!window.confirm(t("profiles.deleteConfirm"))) {
     return;
   }
 
   const { error } = await sb.from("profiles").delete().eq("id", id);
   if (error) {
     console.error("Erreur suppression profil:", error);
-    alert("Impossible de supprimer le profil.");
+    alert(t("alerts.deleteFailed"));
     return;
   }
 
@@ -625,7 +914,7 @@ async function deleteProfile(id, file) {
 
 function openModal() {
   if (dom.openModalBtn.disabled) {
-    alert("Connecte-toi pour ajouter un profil.");
+    alert(t("alerts.signInToAdd"));
     return;
   }
 
@@ -639,6 +928,8 @@ function closeModal() {
 }
 
 function bindEvents() {
+  dom.langFrBtn.addEventListener("click", () => setLanguage("fr"));
+  dom.langEnBtn.addEventListener("click", () => setLanguage("en"));
   dom.loginBtn.addEventListener("click", login);
   dom.logoutBtn.addEventListener("click", logout);
   dom.openModalBtn.addEventListener("click", openModal);
@@ -673,6 +964,8 @@ function bindEvents() {
 
 async function init() {
   cacheDom();
+  state.language = getPreferredLanguage();
+  applyStaticTranslations();
   bindEvents();
 
   sb.auth.onAuthStateChange((event) => {
@@ -700,8 +993,8 @@ async function init() {
     await loadProfiles(true);
   } catch (error) {
     console.error("Erreur initialisation:", error);
-    renderProfilesMessage("Impossible d'initialiser l'application.");
-    setToolbarStatus("Erreur de chargement des donnees.");
+    renderProfilesMessage(t("profiles.initError"));
+    setToolbarStatus(t("toolbar.loadingError"));
   }
 }
 
