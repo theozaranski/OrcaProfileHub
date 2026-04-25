@@ -134,7 +134,7 @@ const translations = {
       stepsAriaLabel: "How it works",
       step1: "Download a 3MF",
       step2: "Import it into OrcaSlicer",
-      step3: "Settings are already filled in",
+      step3: "All settings are pre-configured",
       imageAlt: "Premium illustration of a black and gold 3D printer printing a Benchy"
     },
     visual: {
@@ -144,7 +144,7 @@ const translations = {
     },
     toolbar: {
       addProfile: "+ Add a print profile",
-      guestStatus: "Visitor mode. Sign in to add a profile.",
+      guestStatus: "You're browsing as a guest. Sign in to share a profile.",
       loadingError: "Data loading error."
     },
     filters: {
@@ -173,7 +173,7 @@ const translations = {
       deleteConfirm: "Delete?",
       unknownPrinter: "Unknown printer",
       noName: "Untitled profile",
-      fileReady: "3MF file ready",
+      fileReady: "Ready-to-use 3MF file",
       fileMissing: "Profile without file",
       tagVariant: "Variant: {value}",
       tagFilament: "Filament: {value}",
@@ -191,7 +191,7 @@ const translations = {
       filamentLabel: "Filament",
       filamentPlaceholder: "Choose a filament",
       nozzleLabel: "Nozzle (optional)",
-      send: "Send",
+      send: "Share profile",
       close: "Close"
     },
     alerts: {
