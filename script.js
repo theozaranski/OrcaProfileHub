@@ -47,9 +47,7 @@ function uniqueValues(values) {
 }
 
 function getAuthRedirectUrl() {
-  const url = new URL(window.location.href);
-  url.hash = "";
-  return url.toString();
+  return `${window.location.origin}${window.location.pathname}`;
 }
 
 function slugifyFileBaseName(fileName) {
@@ -220,9 +218,12 @@ async function login() {
 }
 
 async function logout() {
-  await sb.auth.signOut();
+  await sb.auth.signOut({
+    scope: "local"
+  });
   closeModal();
   hideDropdowns();
+  window.location.replace(getAuthRedirectUrl());
 }
 
 async function getUser() {
